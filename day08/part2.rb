@@ -17,6 +17,7 @@ class Field
   end
 
   def enabled
+    print_field
     @field.map {|a| a.inject(:+) }.inject(:+)
   end
 
@@ -30,7 +31,6 @@ class Field
       elsif result = command.match(ROTATE_COL)
         rotate_col(result[:col].to_i, result[:offset].to_i)
       end
-      # print_field
     end
 
     def light_rect(w, h)
@@ -57,10 +57,10 @@ class Field
     end
 
     def print_field
-      # puts "###########################"
+      puts "###########################"
       0.upto(@h-1).each do |i|
         a = 0.upto(@w-1).map do |j|
-          @field[i][j]
+          @field[i][j] == 1 ? '*' : ' '
         end.join(' ')
         puts a
       end
