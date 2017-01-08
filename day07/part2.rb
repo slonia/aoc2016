@@ -1,11 +1,14 @@
+require 'pry'
 class IpValidator
   def initialize(ip)
     @ip = ip
     extract_nets
   end
 
-  def suports_tls?
-    @nets.any? {|net| has_abba?(net) } && !@hypernets.any? {|hypernet| has_abba?(hypernet)}
+  def suports_ssl?
+    net_babs = @nets.map { |net| possible_babs(net) }.flatten
+    hypernet_babs = @hypernets.map { |net| possible_babs(net, true) }.flatten
+    (net_babs & hypernet_babs).any?
   end
 
   private
@@ -35,13 +38,18 @@ class IpValidator
       true
     end
 
-    def has_abba?(string)
-      0.upto(string.size - 4) do |i|
-        s1 = string[i] + string[i + 1]
-        s2 = string[i+3] + string[i + 2]
-        return true if s1 == s2 && s1[0] != s1[1]
+    def possible_babs(string, revert = false)
+      babs = []
+      0.upto(string.size - 3) do |i|
+        if string[i] == string[i + 2] && string[i] != string[i + 1]
+          if revert
+            babs << "#{string[i+1]}#{string[i]}#{string[i+1]}"
+          else
+            babs << "#{string[i]}#{string[i+1]}#{string[i]}"
+          end
+        end
       end
-      false
+      babs
     end
 end
 
@@ -53,7 +61,7 @@ class IpListValidator
 
   def validate
     @lines.each do |line|
-      @valid += 1 if IpValidator.new(line.chomp).suports_tls?
+      @valid += 1 if IpValidator.new(line.chomp).suports_ssl?
     end
     @valid
   end
