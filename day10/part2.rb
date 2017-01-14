@@ -28,12 +28,9 @@ class Bot
 
   def receive(value)
     @values << value
-    puts "And the winner is #{@n}" if winner?
   end
 
-  def winner?
-    @values.sort == [17, 61]
-  end
+
 end
 class Factory
   VALUE = /value (?<value>\d+) goes to bot (?<id>\d+)/
@@ -53,6 +50,10 @@ class Factory
       end
     end
     self
+  end
+
+  def output
+    @outputs[0] * @outputs[1] * @outputs[2]
   end
 
   def run_instruction(instruction)
@@ -91,4 +92,4 @@ class Factory
   end
 end
 
-Factory.new('input.txt').run
+puts Factory.new('input.txt').run.output
