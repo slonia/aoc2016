@@ -2,32 +2,25 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"math"
 	"strconv"
 	"strings"
 )
 
 type Point struct {
-	x, y int64
+	x, y int
 }
 
-func directions() [4]string {
-	return [4]string{"west", "south", "east", "north"}
-}
+var Directions = [4]string{"west", "south", "east", "north"}
 
 func main() {
 	point := new(Point)
-	file, _ := os.Open("input.txt")
-	fi, _ := file.Stat()
-	data := make([]byte, fi.Size()-1)
-	count, _ := file.Read(data)
-	file.Close()
-	fmt.Printf("read %d bytes: %q\n", count, data)
+	data := Read("input.txt")
 	commands := strings.Split(string(data), ", ")
 	position := "north"
 	for _, el := range commands {
 		turn := string(el[0])
-		l, _ := strconv.ParseInt(el[1:len(el)], 10, 64)
+		l, _ := strconv.Atoi(el[1:len(el)])
 		if turn == "L" {
 			position = turn_left(position)
 		} else {
@@ -44,8 +37,8 @@ func main() {
 			point.y += l
 		}
 	}
-	result := abs(point.x) + abs(point.y)
-	fmt.Printf("%d\n", result)
+	result := math.Abs(float64(point.x)) + math.Abs(float64(point.y))
+	fmt.Println(result)
 }
 
 func turn_left(el string) string {
@@ -53,7 +46,7 @@ func turn_left(el string) string {
 	if new_index < 0 {
 		new_index = 3
 	}
-	return directions()[new_index]
+	return Directions[new_index]
 }
 
 func turn_right(el string) string {
@@ -61,22 +54,14 @@ func turn_right(el string) string {
 	if new_index > 3 {
 		new_index = 0
 	}
-	return directions()[new_index]
+	return Directions[new_index]
 }
 
 func current_index(el string) int {
-	for i, ar_el := range directions() {
+	for i, ar_el := range Directions {
 		if ar_el == el {
 			return i
 		}
 	}
 	return -1
-}
-
-func abs(a int64) int64 {
-	if a < 0 {
-		return -a
-	} else {
-		return a
-	}
 }
